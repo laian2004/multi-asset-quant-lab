@@ -1,5 +1,71 @@
 # 国内多资产数据平台
 
+一个面向本地研究的多资产金融数据平台，覆盖公开数据采集、数据质量、DuckDB 查询、GUI 工作台、Agent 编排、因子/机器学习/回测/组合研究、报告自动解读和可复现包。
+
+> 重要说明：本项目只用于本地数据研究、学习和模拟分析。不连接券商，不真实下单，不提供投资建议。公开数据源不可用、官方未发布、DNS/代理失败或访问保护触发时，平台会保留 `pending_retry / blocked_issue / no_data` 等诚实状态，不伪造成功。
+
+## 功能亮点
+
+- 多资产数据采集：国内场内衍生品、股票/ETF/基金/REITs、债券/利率、外汇、商品/贵金属、crypto 公开观察数据。
+- 数据质量与血缘：schema 校验、source health、SLA 检查、数据资产地图、字段画像、数据血缘、产物 manifest。
+- 本地研究引擎：Feature Store、因子实验、参数扫描、ML Benchmark、时间序列验证、正式回测、组合研究、压力测试。
+- GUI 工作台：`/crawl` 抓取、`/history` 历史研究、`/quality` 质量趋势、`/strategies` 策略研究、`/factor-lab` 因子实验、`/portfolio` 组合研究、`/projects` 研究项目、`/agent` Agent 中心、`/reports` 报告中心。
+- Agent 编排：先生成计划、质量门控和风险说明，确认后再执行长任务。
+- 报告与复现：HTML/Markdown 报告、自动解读、下一步建议、可复现包导出。
+
+## 快速开始
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+PYTHONPATH=src python3 -m futures_workflow environment-check
+PYTHONPATH=src python3 -m futures_workflow serve-gui --host 127.0.0.1 --port 8765
+```
+
+打开浏览器访问：
+
+```text
+http://127.0.0.1:8765/
+```
+
+常用命令：
+
+```bash
+PYTHONPATH=src python3 -m futures_workflow validate --date 2026-04-16
+PYTHONPATH=src python3 -m futures_workflow validate-platform-metadata --date latest
+PYTHONPATH=src python3 -m futures_workflow build-db
+PYTHONPATH=src python3 -m futures_workflow agent-plan --goal "验证 ETF 动量研究链路并生成报告" --start 2026-04-16 --end 2026-04-25 --dataset daily_ohlcv
+```
+
+## 仓库内容
+
+- `src/futures_workflow/`：核心平台代码。
+- `tests/`：单元测试与集成 smoke。
+- `config/`：公开源与请求控制配置。
+- `notebooks/`：研究 Notebook 模板。
+- `examples/`：示例 helper。
+- `README.md / STATUS.md / DATASETS.md / SOURCES.md / VALIDATION.md / PLANS.md / AGENTS.md`：项目说明与执行记录。
+
+## 本地数据不会上传
+
+`.gitignore` 已默认排除以下本地运行产物：
+
+- `data/`
+- `state/`
+- `reports/`
+- `exports/`
+- `output/`
+- DuckDB/SQLite/parquet/zip 等生成文件
+- 浏览器、测试和临时缓存
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
+
+---
+
 # 2026-04-27 研究项目闭环与报告自动解读增强
 
 - `/projects` 已从“项目记录页”增强为“研究项目闭环页”：`project-run` 会自动串起 `factor-experiment -> backtest-run -> strategy-leaderboard -> report-generate -> package-export`，并把项目运行、实验结果、报告解读、下一步建议和复现包集中展示。
