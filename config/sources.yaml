@@ -1,0 +1,413 @@
+{
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+  "timeout_seconds": 30,
+  "retry_attempts": 3,
+  "request_behavior": {
+    "default": {
+      "min_interval_seconds": 0.15,
+      "jitter_seconds": 0.05,
+      "blocked_backoff_seconds": 15
+    },
+    "hosts": {
+      "stock.finance.sina.com.cn": {
+        "min_interval_seconds": 0.45,
+        "jitter_seconds": 0.15,
+        "blocked_backoff_seconds": 120
+      },
+      "stock2.finance.sina.com.cn": {
+        "min_interval_seconds": 0.4,
+        "jitter_seconds": 0.15,
+        "blocked_backoff_seconds": 90
+      },
+      "hq.sinajs.cn": {
+        "min_interval_seconds": 0.25,
+        "jitter_seconds": 0.1,
+        "blocked_backoff_seconds": 60
+      },
+      "investor.szse.cn": {
+        "min_interval_seconds": 0.35,
+        "jitter_seconds": 0.1,
+        "blocked_backoff_seconds": 30
+      },
+      "query.sse.com.cn": {
+        "min_interval_seconds": 0.25,
+        "jitter_seconds": 0.08,
+        "blocked_backoff_seconds": 20
+      }
+    },
+    "sina_daily_max_workers": 1,
+    "sina_history_max_workers": 1
+  },
+  "equity_option_history_probe_limit": 24,
+  "equity_option_historical_probe_limit": 120,
+  "equity_option_historical_probe_budget_seconds": 45,
+  "equity_option_historical_probe_timeout_seconds": 3,
+  "equity_option_history_match_limit": 12,
+  "exchanges": {
+    "SHFE": {
+      "calendar_url": "https://www.shfe.com.cn/data/calendar/calendar_en_{year}.dat",
+      "daily_url": "https://www.shfe.com.cn/data/tradedata/future/dailydata/kx{trade_date}.dat",
+      "referer": "https://www.shfe.com.cn/eng/reports/StatisticalData/DailyData/?query_params=kx",
+      "delivery_param_url": "https://www.shfe.com.cn/data/busiparamdata/future/Delivery{trade_date}.dat",
+      "monthly_delivery_results_url": "https://www.shfe.com.cn/data/tradedata/future/monthdata/ExchangeDelivery{year_month}.dat"
+    },
+    "CFFEX": {
+      "daily_url": "http://www.cffex.com.cn/sj/hqsj/rtj/{year_month}/{day}/index.xml",
+      "referer": "http://www.cffex.com.cn/cn/lssjxz.html",
+      "monthly_exercise_report_url": "http://www.cffex.com.cn/sj/monthlyReport/{year_month}/{year_month}MonthlyReport.pdf"
+    },
+    "CZCE": {
+      "daily_url": "https://www.czce.com.cn/cn/DFSStaticFiles/Future/{year}/{trade_date}/FutureDataDaily.txt"
+    },
+    "GFEX": {
+      "bootstrap_url": "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml",
+      "daily_url": "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList",
+      "monthly_delivery_results_url": "http://www.gfex.com.cn/u/interfacesWebTcDeliveryQuotes/loadList",
+      "delivery_results_referer": "http://www.gfex.com.cn/gfex/jgsj/jgtj_tjsj.shtml"
+    },
+    "DCE": {
+      "bootstrap_url": "http://www.dce.com.cn/publicweb/quotesdata/dayQuotesCh.html",
+      "legacy_export_url": "http://www.dce.com.cn/publicweb/quotesdata/exportDayQuotesChData.html",
+      "daily_json_url": "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
+      "contract_info_url": "http://www.dce.com.cn/dcereport/publicweb/tradepara/contractInfo",
+      "referer": "http://www.dce.com.cn/dalianshangpin/xqsj/tjsj26/rtj/rxq/index.html",
+      "monthly_market_report_reference_url": "http://www.dce.com.cn/dalianshangpin/servlets/MonthlyReport",
+      "monthly_market_report_overrides": {
+        "201904": "http://www.dce.com.cn/dalianshangpin/resource/cms/2019/05/2019051410181769090.pdf",
+        "202111": "http://www.dce.com.cn/dalianshangpin/resource/cms/article/489932/6298011/2021112611121813413.pdf"
+      }
+    }
+  },
+  "fallbacks": {
+    "DCE": {
+      "enabled": true,
+      "provider": "hybrid_history"
+    }
+  },
+  "exchange_metadata": {
+    "SHFE": {
+      "launch_date": "1999-01-01",
+      "options_launch_date": "2018-09-21"
+    },
+    "INE": {
+      "launch_date": "2018-03-26"
+    },
+    "CFFEX": {
+      "launch_date": "2010-04-16",
+      "options_launch_date": "2019-12-23"
+    },
+    "CZCE": {
+      "options_launch_date": "2017-04-19"
+    },
+    "GFEX": {
+      "launch_date": "2022-12-22"
+    },
+    "DCE": {
+      "options_launch_date": "2017-03-31"
+    },
+    "SSE": {
+      "launch_date": "2015-02-09",
+      "options_launch_date": "2015-02-09",
+      "market_type": "equities_options"
+    },
+    "SZSE": {
+      "launch_date": "2019-12-23",
+      "options_launch_date": "2019-12-23",
+      "market_type": "equities_options"
+    }
+  },
+  "option_product_name_map": {
+    "CFFEX": {
+      "HO": "上证50股指期权",
+      "IO": "沪深300股指期权",
+      "MO": "中证1000股指期权"
+    },
+    "CZCE": {
+      "AP": "苹果期权",
+      "CF": "棉花期权",
+      "FG": "玻璃期权",
+      "MA": "甲醇期权",
+      "OI": "菜籽油期权",
+      "PK": "花生期权",
+      "PX": "对二甲苯期权",
+      "RM": "菜粕期权",
+      "SA": "纯碱期权",
+      "SF": "硅铁期权",
+      "SH": "烧碱期权",
+      "SM": "锰硅期权",
+      "SR": "白糖期权",
+      "TA": "PTA期权",
+      "UR": "尿素期权",
+      "ZC": "动力煤期权"
+    },
+    "DCE": {
+      "A": "豆一期权",
+      "B": "豆二期权",
+      "C": "玉米期权",
+      "CS": "玉米淀粉期权",
+      "EB": "苯乙烯期权",
+      "EG": "乙二醇期权",
+      "I": "铁矿石期权",
+      "JD": "鸡蛋期权",
+      "L": "聚乙烯期权",
+      "LG": "原木期权",
+      "LH": "生猪期权",
+      "M": "豆粕期权",
+      "P": "棕榈油期权",
+      "PG": "液化石油气期权",
+      "PP": "聚丙烯期权",
+      "V": "聚氯乙烯期权",
+      "Y": "豆油期权"
+    },
+    "SSE": {
+      "510050": "上证50ETF期权",
+      "510300": "沪深300ETF期权",
+      "510500": "中证500ETF期权",
+      "588000": "科创50ETF期权",
+      "588080": "科创板50ETF期权"
+    },
+    "SZSE": {
+      "159901": "深证100ETF期权",
+      "159915": "创业板ETF期权",
+      "159919": "沪深300ETF期权",
+      "159922": "中证500ETF期权"
+    }
+  },
+  "contract_catalog": {
+    "DCE": {
+      "A": {
+        "variety_code": "A",
+        "contract_prefix": "A",
+        "first_listed_month": "200001",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "B": {
+        "variety_code": "B",
+        "contract_prefix": "B",
+        "first_listed_month": "200001",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "BB": {
+        "variety_code": "BB",
+        "contract_prefix": "BB",
+        "first_listed_month": "201301",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "BZ": {
+        "variety_code": "BZ",
+        "contract_prefix": "BZ",
+        "first_listed_month": "202503",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      },
+      "C": {
+        "variety_code": "C",
+        "contract_prefix": "C",
+        "first_listed_month": "200001",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "CS": {
+        "variety_code": "CS",
+        "contract_prefix": "CS",
+        "first_listed_month": "201412",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "EB": {
+        "variety_code": "EB",
+        "contract_prefix": "EB",
+        "first_listed_month": "201909",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      },
+      "EG": {
+        "variety_code": "EG",
+        "contract_prefix": "EG",
+        "first_listed_month": "201812",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      },
+      "FB": {
+        "variety_code": "FB",
+        "contract_prefix": "FB",
+        "first_listed_month": "201304",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "I": {
+        "variety_code": "I",
+        "contract_prefix": "I",
+        "first_listed_month": "201310",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "J": {
+        "variety_code": "J",
+        "contract_prefix": "J",
+        "first_listed_month": "201104",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "JD": {
+        "variety_code": "JD",
+        "contract_prefix": "JD",
+        "first_listed_month": "201311",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "JM": {
+        "variety_code": "JM",
+        "contract_prefix": "JM",
+        "first_listed_month": "201303",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "L": {
+        "variety_code": "L",
+        "contract_prefix": "L",
+        "first_listed_month": "200701",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "LH": {
+        "variety_code": "LH",
+        "contract_prefix": "LH",
+        "first_listed_month": "202101",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "LG": {
+        "variety_code": "LG",
+        "contract_prefix": "LG",
+        "first_listed_month": "202411",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "M": {
+        "variety_code": "M",
+        "contract_prefix": "M",
+        "first_listed_month": "200001",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 8, 9, 11, 12]
+      },
+      "P": {
+        "variety_code": "P",
+        "contract_prefix": "P",
+        "first_listed_month": "200701",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 8, 9, 11, 12]
+      },
+      "PG": {
+        "variety_code": "PG",
+        "contract_prefix": "PG",
+        "first_listed_month": "202003",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      },
+      "PP": {
+        "variety_code": "PP",
+        "contract_prefix": "PP",
+        "first_listed_month": "201402",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "RR": {
+        "variety_code": "RR",
+        "contract_prefix": "RR",
+        "first_listed_month": "201908",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 9, 11]
+      },
+      "V": {
+        "variety_code": "V",
+        "contract_prefix": "V",
+        "first_listed_month": "200905",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 5, 9]
+      },
+      "Y": {
+        "variety_code": "Y",
+        "contract_prefix": "Y",
+        "first_listed_month": "200601",
+        "last_listed_month": "",
+        "typical_cycle_months": [1, 3, 5, 7, 8, 9, 11, 12]
+      }
+    }
+  },
+  "product_name_map": {
+    "CFFEX": {
+      "IF": "沪深300股指期货",
+      "IH": "上证50股指期货",
+      "IC": "中证500股指期货",
+      "IM": "中证1000股指期货",
+      "TS": "2年期国债期货",
+      "TF": "5年期国债期货",
+      "T": "10年期国债期货",
+      "TL": "30年期国债期货"
+    },
+    "CZCE": {
+      "AP": "苹果",
+      "CF": "棉花",
+      "CJ": "红枣",
+      "CY": "棉纱",
+      "ER": "早籼稻(旧)",
+      "FG": "玻璃",
+      "JR": "粳稻",
+      "LR": "晚籼稻",
+      "MA": "甲醇",
+      "ME": "甲醇(旧)",
+      "OI": "菜籽油",
+      "PF": "短纤",
+      "PK": "花生",
+      "PL": "丙烯",
+      "PM": "普麦",
+      "PR": "瓶片",
+      "RI": "早籼稻",
+      "RM": "菜粕",
+      "RO": "菜籽油(旧)",
+      "RS": "油菜籽",
+      "SA": "纯碱",
+      "SF": "硅铁",
+      "SH": "烧碱",
+      "SM": "锰硅",
+      "SR": "白糖",
+      "TA": "PTA",
+      "TC": "动力煤(旧)",
+      "UR": "尿素",
+      "WH": "强麦",
+      "WS": "强麦(旧)",
+      "WT": "硬麦",
+      "ZC": "动力煤",
+      "PX": "对二甲苯"
+    },
+    "DCE": {
+      "A": "豆一",
+      "B": "豆二",
+      "BB": "胶合板",
+      "BZ": "纯苯",
+      "C": "玉米",
+      "CS": "玉米淀粉",
+      "EG": "乙二醇",
+      "EB": "苯乙烯",
+      "FB": "纤维板",
+      "I": "铁矿石",
+      "J": "焦炭",
+      "JD": "鸡蛋",
+      "JM": "焦煤",
+      "L": "聚乙烯",
+      "LH": "生猪",
+      "LG": "原木",
+      "M": "豆粕",
+      "P": "棕榈油",
+      "PG": "液化石油气",
+      "PP": "聚丙烯",
+      "RR": "粳米",
+      "V": "聚氯乙烯",
+      "Y": "豆油"
+    }
+  }
+}

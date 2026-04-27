@@ -1,0 +1,68 @@
+# Python runtime/cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local dependency folders
+.venv/
+venv/
+env/
+ENV/
+node_modules/
+
+# Local environment / secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project runtime data: keep generated data out of GitHub
+/data/
+/state/
+/reports/
+/exports/
+/output/
+
+# Local databases and generated binary artifacts
+*.duckdb
+*.duckdb.wal
+*.db
+*.sqlite
+*.sqlite3
+*.parquet
+*.zip
+*.tar
+*.tar.gz
+
+# Browser/test/runtime caches
+.playwright-cli/
+.tmp/
+.tmp-*/
+tmp/
+temp/
+
+# Notebook execution caches
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/

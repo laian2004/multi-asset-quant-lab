@@ -1,0 +1,362 @@
+# STATUS.md
+
+# 2026-04-27 研究项目闭环增强状态
+
+- `project-run` 已升级为真实研究闭环：自动运行因子实验、正式回测、策略排行榜、报告生成和可复现包导出，不再只是写一条项目运行记录。
+- `report-generate` 已增强自动解读：同步写入 `report_insights / recommendation_items`，用于说明质量风险、最佳模型、关键因子、策略排行、压力情景和下一步建议。
+- GUI `/projects` 已新增实验对比、自动解读、下一步建议区块；GUI `/reports` 已新增自动解读和建议区块。
+- 已完成本地真实 smoke：`project-create` 生成项目 `project-4b03284fbb604a5b`，`project-run` 成功产出 `factor_experiments / backtest_* / strategy_leaderboard / research_reports / report_insights / recommendation_items / reproducible_packages`。
+- 最新验证：`232` 个单元测试通过，`py_compile` 通过，`validate --date 2026-04-16` 成功，`validate-platform-metadata --date 2026-04-25` 成功，`environment-check` 成功，`build-db dataset_count = 125`，GUI smoke 覆盖 `/projects /reports /agent` 成功。
+
+# 2026-04-27 产品内插件化 Agent 平台状态
+
+- 已新增内部 `PluginRegistry` 与 `AgentOrchestrator`，把数据资产、质量守门、Feature、因子、ML、回测、报告、血缘和可复现包统一暴露为产品内插件。
+- GUI 新增 `/agent`：支持输入研究目标、选择数据集/时间窗口/报告类型，生成计划、展示风险、质量门控、任务队列、步骤状态、日志、研究记忆、报告解读、下一步建议和模型注册/漂移。
+- CLI 新增并可运行：`agent-plan / agent-run / agent-status / agent-cancel / agent-retry / plugin-list / plugin-run / quality-gate / memory-search / model-registry-build / model-drift-check`。
+- 新增 18 个 Agent/插件平台表已物化，并通过 `sync-platform-metadata --date 2026-04-25` 与 `validate-platform-metadata --date 2026-04-25`；`build-db` 成功，当前 `dataset_count = 125`。
+- 已完成一次真实 Agent smoke：`agent-plan` 先停在 `awaiting_confirmation`，`agent-run` 确认后执行 8 个插件步骤并落出 `agent_tasks / agent_steps / plugin_runs / task_logs / report_insights / recommendation_items` 等结果。
+
+## 2026-04-26 Pro Max 全量升级状态
+
+- 本轮 Pro Max 必做范围已落地到 CLI、GUI、normalized dataset、registry、source catalog、DuckDB、validation 与文档：
+  - 数据资产地图：`dataset_inventory / dataset_field_profile`，GUI `/data-map`。
+  - 数据血缘与产物追踪：`data_lineage / artifact_manifest / reproducible_packages`，GUI `/lineage`。
+  - SLA 与知识库：`dataset_sla_rules / sla_violations / knowledge_index`，GUI `/data-map` 与 `/knowledge`。
+  - Feature Store 与 ML Benchmark：`ml_feature_store / ml_benchmarks / ml_validation_folds / ml_classification_results`，GUI `/strategies`。
+  - 因子实验室：`factor_experiments / parameter_scans / strategy_leaderboard`，GUI `/factor-lab`。
+  - 组合与情景推演：`portfolio_experiments / scenario_simulations`，GUI `/portfolio`。
+  - 研究项目与可复现包：`research_projects / project_runs / reproducible_packages`，GUI `/projects`。
+- 高级模型已纳入白名单模板与 benchmark：
+  - `linear_regression / ridge / lasso / pca / kmeans / random_forest / xgboost / lightgbm / catboost / svm / mlp / regime_detection`
+  - `lightgbm` 与 `catboost` 当前以本地 sklearn 兼容适配器保证可运行；依赖完整环境中可以替换为原生包，但当前结果会在参数中保留 adapter 说明。
+- 最新验证：
+  - `python3 -m unittest discover -s tests`：`227` 个测试通过
+  - `python3 -m py_compile $(find src -name "*.py")`：通过
+  - `PYTHONPATH=src python3 -m futures_workflow validate --date 2026-04-16`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow validate-platform-metadata --date 2026-04-25`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow environment-check`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow build-db`：成功，`dataset_count = 107`
+  - GUI smoke：`/ /crawl /history /quality /strategies /factor-lab /portfolio /projects /data-map /lineage /scheduler /reports /knowledge /api/summary.json /healthz` 全部 `200 OK`
+- 最新实际产物样本：
+  - `dataset_inventory/2026-04-25.csv`：`107` 行
+  - `dataset_field_profile/2026-04-25.csv`：`1918` 行
+  - `knowledge_index/2026-04-25.csv`：`148` 行
+  - `dataset_sla_rules/2026-04-25.csv`：`107` 行
+  - `sla_violations/2026-04-25.csv`：`20` 行
+  - `ml_feature_store/2026-04-25.csv`：`274370` 行
+  - `ml_benchmarks/2026-04-25.csv`：`9` 行
+  - `ml_validation_folds/2026-04-25.csv`：`3` 行
+  - `ml_classification_results/2026-04-25.csv`：`1` 行
+  - `factor_experiments/2026-04-25.csv`：`1` 行
+  - `parameter_scans/2026-04-25.csv`：`8` 行
+  - `strategy_leaderboard/2026-04-25.csv`：`1` 行
+  - `portfolio_experiments/2026-04-25.csv`：`2` 行
+  - `scenario_simulations/2026-04-25.csv`：`1` 行
+  - `research_projects/2026-04-25.csv`：`2` 行
+  - `project_runs/2026-04-25.csv`：`1` 行
+  - `reproducible_packages/2026-04-25.csv`：`1` 行
+
+## 2026-04-25 大版本升级状态
+
+- 一期工程 `100%` 结论继续保持，不回退；唯一允许保留的 runtime 外部阻塞仍是 `cffex.options_exercise_results / publication_lag`。
+- 本轮“大版本扩展”已把项目从本地数据库升级为成熟本地投研平台第一阶段：
+  - 研究分析：`research-run` 与 `research_metrics` 已落地，GUI `/history` 可继续承接历史研究视图。
+  - 算法模板库：`AlgorithmRegistry` 已落地，`algorithm-run` 只运行内置模板，不开放任意脚本执行。
+  - 金融数学模型：`option_analytics / bond_analytics / curve_analytics` 已接入 Black-Scholes、二叉树、债券 YTM/久期/凸性与曲线斜率首版。
+  - 因子与模拟交易：`factor-run / strategy-backtest / paper-sim` 已落地，GUI `/strategies` 已可发起日频模拟研究。
+  - 正式回测与风控：`backtest-run / risk-run / portfolio-optimize` 已落地，输出净值曲线、持仓、交易、策略对比、风险指标与组合权重。
+  - 机器学习研究：`ml-run` 已落地，当前覆盖线性回归、Ridge、Lasso、PCA、KMeans、随机森林、XGBoost 与 regime detection，并输出 `ml_model_runs / ml_predictions / ml_feature_importance / model_diagnostics`；`--tune` 现会基于验证集做小网格选参，并记录 `validation_r2 / mae / rmse / train_count / test_count`。
+  - 因子表现、压力测试与实验追踪：`factor-performance / stress-test / experiment-list / artifact-list` 已落地，输出 `factor_performance / stress_test_results / experiment_runs / artifact_manifest / report_artifacts`。
+  - 质量运营：`quality-diagnose`、`quality_diagnostics` 与 `anomaly_events` 已落地，GUI `/quality` 可展示质量诊断与趋势表。
+  - 数据质量评分：`quality-score` 已落地，输出 `dataset_quality_scores` 并进入 GUI `/quality` 与报告图表。
+  - 本地调度：`scheduler-tick`、`state/schedules.json`、`state/scheduler_runs.json` 与 GUI `/scheduler` 已落地。
+  - 报告与告警摘要：`report-generate`、`research_reports`、`reports/YYYY-MM-DD/*.md|*.html` 与 GUI `/reports` 已落地。
+  - Notebook 工作区：`notebooks/` 与 `examples/research_helpers.py` 已落地。
+- 体验层最新修正：
+  - `/reports` 默认定位到最新已生成报告日期，并支持只读打开白名单内的 HTML / Markdown 报告文件。
+  - `/scheduler` 已明确区分“运行所有到期任务”和“手动运行此任务”。
+  - `/strategies` 已升级为算法工作台，当前覆盖研究指标、因子、金融数学模型、风险指标、组合配置、正式回测、模拟组合、ML、因子表现、压力测试和实验历史。
+  - 研究/质量/组合类空表会在 GUI 中提示“未生成/可生成”或展示 `not_applicable/no_data` 原因，避免误解为采集失败。
+- 最新验证：
+  - `python3 -m unittest discover -s tests`：`227` 个测试通过
+  - `python3 -m py_compile $(find src -name "*.py")`：通过
+  - `PYTHONPATH=src python3 -m futures_workflow validate --date 2026-04-16`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow validate-platform-metadata --date 2026-04-25`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow environment-check`：成功
+  - `PYTHONPATH=src python3 -m futures_workflow build-db`：成功，`dataset_count = 107`
+- 最新实际产物样本：
+  - `research_metrics/2026-04-24.csv`：`1` 行
+  - `factor_signals/2026-04-24.csv`：`6657` 行
+  - `strategy_backtests/2026-04-24.csv`：`1` 行
+  - `paper_portfolios/2026-04-24.csv`：`1` 行
+  - `quality_diagnostics/2026-04-24.csv`：`23` 行，当前无 `critical`，只保留 `info / warning`
+  - `scheduler_runs/2026-04-25.csv`：`1` 行
+  - `research_reports/2026-04-24.csv`：`1` 行
+  - `ml_model_runs/2026-04-16.csv`：已跑通 `linear_regression / ridge / lasso / pca / kmeans / random_forest / xgboost / regime_detection`
+  - `factor_performance/2026-04-16.csv`：`7` 行
+  - `stress_test_results/2026-04-16.csv`：`2` 行
+  - `dataset_quality_scores/2026-04-25.csv`：`89` 行；Pro Max 新增后 `dataset_inventory/2026-04-25.csv` 已覆盖 `107` 个数据集
+  - `report_artifacts/2026-04-25.csv` 与 `artifact_manifest/2026-04-25.csv`：均已生成图表附件血缘
+
+## 2026-04-24 工程收口阶段矩阵（历史基线）
+
+- A1：`done`
+  - canonical/query 隔离、audit/repair、completeness-aware validate 已稳定。
+- A2：`done`
+  - `contracts_snapshot`、`contracts_latest`、`options_exercise_results`、`futures_delivery_results` 已按正式语义收口。
+  - runtime 唯一剩余阻塞不是 A2 工程缺口，而是 `cffex.options_exercise_results / publication_lag`。
+- A3：`done`
+  - `DCE / SZSE / SSE` 弱源已按“official > official_browser_bootstrap > fallback_online”与真实 provenance 语义收口。
+  - 近期 canonical 补样、历史代表日审计与 bounded probe 逻辑已进入稳定态。
+- B：`done`
+  - `regression-smoke` 已成为正式 release gate，并把 `status / engineering_status / blocked_issues / 连续窗口摘要` 一起落入 `state / run_health / GUI`。
+  - broader audit 当前 `needs_repair_dates = []`，只剩一个外部 `blocked_issue`。
+- C：`done`
+  - 以“第一版 latest-view 多资产平台”口径完成。
+  - 当前已落地的股票/基金/REITs、债券/利率、外汇、贵金属/商品/碳、crypto 观察均已进入 GUI / DuckDB / export / validation。
+  - 更深历史和更细逐券扩展仍是后续增量，不属于本轮 done 定义。
+- GUI：`done`
+  - GUI 已能统一展示 `regression_smoke / run_health / asset_coverage / source_health / source_type_overview / issue_category_overview / DuckDB manifest`。
+  - GUI 已拆成总览页 `/` 与独立抓取页 `/crawl`；前者负责浏览，后者负责点击触发抓取与预抓。
+  - GUI 独立抓取页现已新增“一键抓取当前已接入的全部数据”入口，直接面向 latest-view 全量同步。
+  - GUI 已新增“逐交易所预抓工作台”，支持 `production / trial`、外部阻塞单列展示与试跑自动清理。
+  - GUI 二期已新增 `/history /quality`，分别负责历史研究与质量趋势浏览。
+- DuckDB / Export：`done`
+  - 当时 `build-db` 成功，`dataset_count = 60`；合法空表仍可索引、可导出。
+
+## 2026-04-24 状态摘要（历史基线）
+
+- `python3 -m unittest discover -s tests`：`215` 个测试通过
+- `PYTHONPATH=src python3 -m futures_workflow validate --date 2026-04-16`：成功
+- `PYTHONPATH=src python3 -m futures_workflow validate-platform-metadata --date 2026-04-24`：成功
+- `PYTHONPATH=src python3 -m futures_workflow environment-check`：成功，当前 environment health = `success / success`
+- `PYTHONPATH=src python3 -m futures_workflow build-db`：成功，DuckDB 当前索引 `60` 个数据集
+- `state/regression_smoke.json` / `run_health` / GUI 当前一致为：
+  - `status=partial_success`
+  - `engineering_status=success`
+  - `issue_category_counts={"result_chain_publication_lag": 1}`
+- `source_health` 当前只剩一个外部阻塞源：
+  - `source_id = cffex.options_exercise_results`
+  - `issue_root_cause = publication_lag`
+  - `last_status = pending_retry`
+- `asset_coverage.exchange_derivatives_cn` 当前为：
+  - `engineering_status = done`
+  - `runtime_status = pending_retry`
+  - `external_issue_count = 1`
+  - `coverage_ratio = 8/8`
+- 逐交易所预抓当前已落地：
+  - `python3 -m futures_workflow pregrab-window ...` 已可运行
+  - `state/pregrab_runs.json` 已成为正式摘要状态文件
+  - GUI 已可直接发起 `production / trial`
+  - 最新真实 smoke：
+    - `SHFE 2026-04-14..2026-04-21 trial = success / success`
+    - `CFFEX 2026-04-17 trial = partial_success / success`
+- 二期首批历史化底座当前已落地：
+  - `state/window_runs.json`
+  - `run_history`
+  - `coverage_history`
+  - `source_health_history`
+  - `/history`
+  - `/quality`
+  - `environment-check`
+  - `sync-public-assets|references|bonds|crypto --start --end`
+
+## Implemented
+
+- on-exchange futures daily quote workflow for the 5 mainland futures exchanges
+- on-exchange options daily quote workflow across futures exchanges plus SSE and SZSE
+- multi-dataset normalized outputs
+- provenance fields in normalized outputs
+- canonical/query output separation
+- query-specific state under `state/query_runs/`
+- completeness-aware `validate`
+- canonical audit and repair tooling
+- polluted canonical sample date `2026-04-16` rebuilt successfully
+- `2021-04-16` 已完成 rebuild / re-audit，当前 canonical day 为 `success`，不再保留历史 `blocked_issues`
+- filtered query runs no longer overwrite canonical normalized outputs or `contracts_latest.csv`
+- `contracts_snapshot` is now master-data-first: quote-side fallback metadata no longer fills formal master fields by default
+- `options_exercise_results` is now an official-only result-chain dataset and is no longer quote-derived
+- `futures_delivery_results` is now an independent official-result collector with explicit `no_data` semantics
+- `futures_delivery_results` 已开始接入逐交易所官方结果端点：`SHFE / INE` 现支持基于上期所官方交割参数 + 月度交割结果 JSON 的分市场拆分，`GFEX` 现支持官方月度交割统计接口，`DCE` 现支持官方月度市场报告 PDF 交割结果解析；`2026-04-16` 已真实落出 `GFEX = 2` 行，`2019-04-16` 已可真实落出 `DCE = 2` 行
+- `options_exercise_results` 已新增 `CFFEX` 官方月报 PDF 聚合结果链：`2021-04-16` 当前可真实落出 `1` 行官方产品级行权结果
+- `options_exercise_results` 已新增 `DCE` 官方月度市场报告 PDF 聚合结果链：`2019-04-16` 当前可真实落出 `2` 行官方 `CALL / PUT` 聚合行权结果
+- `options_exercise_results` 已新增 `SSE` 官方“行权交收信息”接口：`2021-04-28` 当前可真实落出 `4` 行按标的拆分的认购/认沽聚合结果
+- `options_exercise_results` 已新增 `SZSE` 官方“行权交收统计”接口：`2026-03-26` 当前可真实落出 `8` 行按标的拆分的认购/认沽聚合结果
+- 结果链状态语义已进一步收紧：
+  - `2026-04-16 validate` 当前会诚实显示 `options_exercise_results = no_data`
+  - `2026-04-16 validate` 当前会诚实显示 `futures_delivery_results = success`
+  - `2021-04-16 validate` 当前会诚实显示 `options_exercise_results = success`
+  - `2026-04-17 validate` 当前会诚实显示 `options_exercise_results = pending_retry`
+  - `CFFEX` 官方月报若返回 `HTTP 200` 的 HTML 错误页而不是 PDF，当前会诚实写 raw `.html` 并落成 `pending_retry`
+  - 同一天同一结果链 raw 如果响应扩展发生变化，collector 现在会自动清理旧扩展残留，只保留当前真实 raw 文件
+- `contracts_latest.csv` now updates only after a successful canonical all-scope run has finished
+- `contracts_latest.csv` 现会直接复制最新成功 canonical all-scope 的 `contracts_snapshot` 文件内容，避免再次出现字段集/行数/主键与源快照漂移
+- request pacing / jitter / protective-block backoff is now enabled for weak online sources, especially Sina-linked option endpoints
+- historical `SSE / SZSE / DCE` option quote runs now prefer cached raw payloads before attempting live fetches
+- historical `SSE / SZSE` master-data runs now prefer cached official payloads before attempting live metadata fetches
+- `SSE / SZSE` option metadata now has its own cache layer (`equity_options_metadata / equity_options_expire_days`), so repeated historical runs no longer need to re-query the same Sina symbol metadata
+- `SSE / SZSE` option sources now also reuse nearby `contracts_snapshot` raw payloads as an auxiliary discovery layer when the official same-day summary/risk endpoints are unavailable
+- `SZSE` nearby `contracts_snapshot` raw 命中的 `symbol -> contract/strike/expire` 现在会继续沉淀回 `equity_options_metadata`，让后续历史重跑更接近“可自举”而不是再次依赖 live symbol metadata
+- `SZSE` 历史期权又新增了一层“本地历史日线缓存筛 symbol + 限量 metadata 探测”的 discovery 路径，默认会按保守上限逐步积累历史 numeric symbol 正式 metadata
+- `SZSE` 历史期权 discovery 进一步收紧：
+  - 历史发现开始前会先把 nearby `contracts_snapshot` 批量反灌到 `equity_options_metadata`
+  - 历史发现现在会优先尝试官方 `option_drhy + txtQueryDate` 历史分页；命中时会把 `symbol -> contract/strike/expire/underlying` 直接回填到本地 metadata cache
+  - 若 `option_drhy + txtQueryDate` 实际返回的是“当前日期页面”而不是目标历史页，source 会显式忽略该结果，避免把当前合约误写进历史 cache
+  - 深历史 live metadata probe 现在受数量 / 总时长 / 单次超时三重预算约束，避免老历史修复长时间卡在单个符号请求上
+- `SSE` options now have an official recent/current quote path via `yunhq.sse.com.cn:32042`, reducing dependence on Sina for near-current uncached dates
+- full unit test discovery is green for the current A1/A2 baseline
+- local GUI is now runnable and can browse canonical/query outputs, dataset health, recent runs, and the multi-asset platform registry
+- local GUI now also supports read-only dataset download for the currently selected view via `CSV / JSON / Parquet`, reusing the canonical DuckDB/export layer without mutating data state
+- local GUI now supports first-pass common filters for `asset_family / market / exchange / instrument_type / symbol / contract / currency / tenor`, and the same filters are forwarded into the read-only export layer
+- a multi-asset platform registry shell now exists, with explicit implemented vs planned family boundaries
+- public non-derivatives snapshots are now partially landed: A 股快照、ETF 快照、REITs 快照已经可以同步、校验并在 GUI 中浏览
+- public non-derivatives snapshots continue to expand: 北交所股票快照、可转债快照已接入代码与 GUI，其中可转债已完成真实落地
+- public non-derivatives snapshots continue to expand again: 开放式基金净值快照、货币基金收益快照已完成真实落地并进入默认 public snapshot 集合
+- public non-derivatives snapshots continue to expand once more: 上金所现货日行情 `sge_spot_daily_quotes` 已完成真实 collector，并可单独同步、校验和在 GUI 中展示
+- public non-derivatives snapshots continue to expand yet again: `carbon_market_snapshot` 已完成真实 collector、真实落地，并进入 GUI / DuckDB / 导出链路
+- public reference datasets are now partially landed: 人民币外汇参考价、人民币外汇即期报价、Shibor、上海金 / 上海银基准价已经可以同步、校验并在 GUI 中浏览
+- public reference datasets continue to expand: 外汇与黄金储备参考序列 `reserve_reference_series` 已完成真实 collector、真实落地，并进入 GUI / DuckDB / 导出链路
+- public reference datasets continue to expand again: `fx_pair_quotes / fx_swap_quotes / fx_c_swap_curve` 已完成真实 collector、真实落地，并进入 GUI / DuckDB / 导出链路
+- public reference datasets continue to expand further: `rmb_middle_rates` 已完成真实 collector、真实落地，并进入 GUI / DuckDB / 导出链路；当前公开可得历史上限为 `2021-05-13`
+- 债券与利率参考表继续扩展：LPR 与回购定盘利率 / 银银间回购定盘利率已经可以同步、校验并在 GUI 中浏览
+- 债券与利率参考表继续扩展：`cn_us_treasury_yields` 已完成真实 live 落地，collector / schema / DuckDB / GUI / 导出 / 测试全部接通，作为跨市场利率参考表进入平台
+- 银行间债券成交 / 报价 / 收益率曲线已进入真实 collector，可同步、校验并在 GUI 中浏览
+- 交易所债券公开摘要继续扩展：上交所债券成交概览与现券市场概览已进入真实 collector，可同步、校验并在 GUI 中浏览
+- crypto_global_observation 已扩展为六张数据集：
+  - `crypto_global_snapshot`
+  - `crypto_assets`
+  - `crypto_daily_quotes`
+  - `crypto_derivatives_public`
+  - `crypto_bitcoin_holdings_public`
+  - `crypto_cme_bitcoin_report`
+- 平台级派生表已真实落地：
+  - `instrument_master`
+  - `bond_master`
+  - `bond_quotes`
+  - `fx_quotes`
+  - `commodity_spot_quotes`
+  - `crypto_global_quotes`
+  - `daily_ohlcv`
+  - `fund_nav`
+  - `reits_quotes`
+  - `trading_calendar`
+  - `yield_curves`
+  - `validation_results`
+  - `source_health`
+  - `run_history`
+  - `coverage_history`
+  - `source_health_history`
+- `validation_results` 现已落表 `blocked_issue_count / blocked_issues`
+- `source_health` 现已落表 `issue_category / blocked_reason`
+- `source_health` 现已显式纳入 `futures_delivery_results / options_exercise_results` 的 source 条目
+- `source_health` 现也会显式纳入平台派生数据集条目：`instrument_master / daily_ohlcv / fund_nav / reits_quotes / trading_calendar / validation_results / source_health`
+- `source_health` 当前以“最近一次已记录的衍生品运行状态”为准，不再只盯最近 fully successful canonical 日
+- GUI 已新增“数据质量阻塞与修复”区块，可直接查看当前日期的 `issues / blocked_issues`
+- GUI 已新增结构化阻塞类别展示，可直接查看 `issue_category_counts`
+- GUI 已新增 DuckDB 索引概览，可直接查看当前 manifest 中的 dataset/file_count/row_count/built_at
+- `regression-smoke` 最近一次运行结果现已持久化到 `state/regression_smoke.json`
+- GUI 已新增最近一次 `regression-smoke` 摘要，可直接查看回归时间、运行状态、工程收口状态、代表日期状态、连续窗口状态与阻塞类别
+- GUI 已新增 source catalog 与 `source_type` 统计，可直接查看 `official / fallback_online / derived` 的注册覆盖
+- GUI 已新增最近 `source_health` 异常源明细，可直接查看阻塞源、最近状态、阻塞原因与消息
+- GUI 顶部筛选区现已改成“数据集驱动的可选控件”：`asset_family / market / exchange / instrument_type / currency / tenor` 会自动给出下拉选项，`symbol / contract` 会自动给出建议输入
+- 现已新增 `pregrab-window` CLI：支持逐交易所、逐窗口、`instrument_group=all` 的 `production / trial` 预抓
+- 现已新增 `state/pregrab_runs.json`：用于持久化最近一次逐交易所窗口预抓摘要
+- GUI 现已新增“逐交易所预抓工作台”：
+  - 支持 `CFFEX / CZCE / DCE / GFEX / SHFE / SSE / SZSE` 多选
+  - 支持 `近 7 天 / 近 1 月 / 近 3 月 / 自定义`
+  - 支持 `production` 正式抓取保留与 `trial` 隔离试跑自动清理
+  - 支持直接展示 `status / engineering_status / cleanup_status / blocked_issues`
+  - 当前该工作台已从总览页拆分到独立 `/crawl` 页面，避免把浏览与抓取交互混在同一页
+- `trial` 预抓当前会在隔离 storage root 下执行，结束后自动清理临时 `data/state/db/exports`，只保留摘要
+- `CFFEX` 期货与期权 XML parser 现已兼容 `&nbsp; / &NBSP;`，避免旧 XML/HTML 缓存在预抓中触发 `XMLSyntaxError`
+- `PregrabRunner` 现已把 `publication_lag` 归类为外部阻塞，不再因为结果链 completeness 信号把 `CFFEX` 单点阻塞误判成工程失败
+- 平台元数据现已新增 `run_health`，最近一次 `regression-smoke` 的运行状态、工程收口状态、代表日期和连续窗口结果已能作为派生表进入 GUI / DuckDB / export
+- 平台元数据现已新增 `asset_coverage`，GUI 已能直接展示各资产族最新覆盖状态、覆盖比例和缺失数据集
+- 平台元数据现已新增 `source_type_overview`，GUI 已能直接展示 `official / fallback_online / derived / official_browser_bootstrap` 的运行总览
+- 平台元数据现已新增 `issue_category_overview`，GUI 已能直接展示 `healthy / no_data / retry_or_error / blocked_issue` 的运行总览
+- `build-db` 当时已扩到 `60` 个数据集，`run_health / run_history / coverage_history / source_health_history / asset_coverage / source_type_overview / issue_category_overview / crypto_derivatives_public / crypto_cme_bitcoin_report` 已进入 DuckDB manifest
+- `2026-04-24` 平台校验中曾暴露的 `instrument_master missing_raw_paths` 已通过重新补回 `2026-04-15` 的 `CFFEX / CZCE` 官方 raw 消除；当前 `validate-platform-metadata --date 2026-04-24` 已恢复全绿
+- 本地 DuckDB 索引层与导出命令已落地：`build-db / export / list-sources / audit / repair / serve-gui` 已可运行
+- canonical 批量审计现在已有正式入口：`audit --all / repair --all`，最近实测已扫出 7 个 canonical 日期全部 `needs_repair = false`
+- `regression-smoke` 已作为新的 B 收口入口落地：会把代表日期 `validate`、`audit --all`、平台元数据同步/校验，以及可选 `build-db / GUI smoke` 串成一条命令
+- 完整 `regression-smoke` 最近一次已跑成 `partial_success`
+  - `2010 / 2015 / 2021 / 2026` 代表日期全部通过
+  - `audit.needs_repair_dates = []`
+  - 连续窗口 `latest_7_trading_days / latest_1m_trading_days / latest_1y_monthly_sample / latest_3y_quarterly_sample` 已正式进入 `state / GUI / run_health`
+  - `audit --all` 顶层现在会同步聚合 `issues / blocked_issues / issue_category_counts`
+  - `regression-smoke` 现在会按交易日日历生成窗口目标集，并在缺失 canonical 样本时自动执行 canonical all-scope 补样
+  - `regression-smoke` 现已拆成“运行状态”和“工程收口状态”双口径，运行状态保持诚实，工程收口状态单独评估外部阻塞
+  - 最近一次 `--skip-build-db` 仍会诚实保留 `{"result_chain_publication_lag": 1}`
+  - `build_db.dataset_count = 60`
+- `repair --date <trade_date>` 现在支持对显式日期做基于 raw/summary 的强制重建，用来刷新状态语义升级后的 canonical day
+- `repair` 现在还会在“结果链无缓存 raw、但主行情/主数据已能证明当日无到期结果”的场景下离线刷新旧 summary，把过时的 `No official ... endpoint configured.` 收敛为更诚实的 `No expiring ... found ...`
+- 结果链历史 raw 的离线兼容性已补强：非 UTF-8 文本缓存与带 `&nbsp;` 的旧 XML/HTML 结果页都已能被 repair 安全重建
+- `audit --all` 现在还会聚合 `issues / blocked_issues / issue_category_counts`，便于把 `result_chain_publication_lag / result_chain_source_gap / historical_public_contract_gap / coverage_gap` 区分开来
+
+## Partially implemented
+
+- exchange-specific official master-data sources are still incomplete for several futures/options venues, so some formal fields remain blank by design
+- `futures_delivery_results` and `options_exercise_results` are formal datasets, but most venues still lack configured official result endpoints
+- `futures_delivery_results` 已不再是“全市场纯空壳”：`SHFE / INE / GFEX / DCE` 已接入首批官方端点；剩余交易所仍待继续接齐
+- `options_exercise_results` 已不再是“纯空壳”：
+  - `CFFEX` 已接入官方月报 PDF 聚合结果链
+  - `DCE` 已接入官方月度市场报告 PDF 聚合结果链
+  - `SSE` 已接入官方“行权交收信息” JSON 接口
+  - 其余交易所仍待继续接齐 official endpoint
+- `CFFEX` 最近日期月报链路仍可能返回 HTML 错误页；当前语义已收紧为 `pending_retry / blocked_issue`，但端点稳定性问题仍存在
+- DCE / SSE / SZSE option chains are stable on cached reruns for validated dates, but are not yet uniformly stable on uncached nearby dates
+- `2026-04-17` 当前不再是 repair / canonical 污染问题
+  - 代表日期回归与 `regression-smoke` 已通过
+  - 当前唯一剩余阻塞会诚实保留为 `blocked_issue`：`options_exercise_results / CFFEX = publication_lag`
+- `2026-04-14 --instrument-group all` 已从 `partial_success` 推进到 `success`，并完成 `validate`
+- `2026-04-14..2026-04-17 --instrument-group all` 的短窗口主干 quote/master/view 已跑通；`2026-04-17` 当前只剩 `CFFEX` 官方结果链发布时间阻塞，并已被诚实归类到 `blocked_issue`
+
+## Known defects / risks
+
+- `SSE` options are improved on recent uncached dates through the new official current quote path, but older uncached historical dates still depend on fallback behavior
+- `SSE / SZSE` 在“已发现适用合约但线上日线 0 行且无缓存可复用”时，现在会诚实落成 `pending_retry`，不再误分类成 `no_data` 或 `error`
+- `SZSE` options 已补上“近邻 cached raw 提取 underlying 再做历史 symbol discovery”的兜底；近期未缓存日期已有样本跑通，但更老日期仍可能受在线源波动影响
+- `SZSE` options 又补上“配置标的目录兜底”的历史发现路径：当官方 summary 和近邻缓存都缺失时，会继续用 `option_product_name_map` 里的标的代码做候选发现
+- `SZSE` 2021 这类更老历史日期的主要硬缺口已经从“完全没有 discovery path”缩小到“缺少足够多的历史 numeric symbol 正式 metadata 缓存”；语义上仍是未完成，而不是假装 success
+- `DCE` options 仍依赖 `fallback_online` 取得 validated success；最近交易日与近期缓存日已打通，但更早的无缓存近期日仍会走慢速历史回补
+- older raw files written before the sidecar-provenance patch may not yet have `.meta.json` companions until those dates are re-fetched or rebuilt
+- historical deep coverage outside current canonical sample dates still needs broader B1 regression validation
+- old query runs created before A1 may still exist on disk and are not treated as canonical, but only repaired canonical dates are explicitly audited
+- deep-history archive inputs may still exist on disk for repair purposes, but they are no longer part of canonical success semantics
+- 股票 / 北交所 / ETF / REITs / 可转债 / 外汇参考 / Shibor / 金银基准价之外的更多非衍生品资产族仍只有注册层，没有正式 collector
+- 商品 / 能源侧现在已新增“国内碳市场 as-of 快照”，但更广的商品指数、现货价格与能源参考表仍未系统接齐
+- `sge_spot_daily_quotes` 已真实落地，但仍保留为 opt-in collector，不放进默认稳定 public-assets bundle
+- `public_references` 已覆盖参考价与部分即期报价，不等于债券全量行情、外汇远期/掉期或贵金属现货品种历史行情已经接齐
+- `public_references` 现已覆盖参考价、人民币即期、外币对即期、远掉报价与一条 C-Swap 曲线，但仍不等于完整银行间外汇历史库、更多币对掉期曲线或官方主数据体系已经接齐
+- `reserve_reference_series` 当前输出的是最近一期已发布的 `SAFE / PBOC` 公开口径快照，不等于已经打通完整宏观月度历史库或统一官方主数据模型
+- `public_bonds` 当前已覆盖银行间成交 / 报价 / 曲线点位，以及上交所债券摘要表，但不等于交易所债逐券行情、债券主数据、活跃券、评级等链路已经接齐
+- crypto 目前仅是全球公开观察快照，不包含历史序列全覆盖、CME 全量数据集或任何交易服务能力
+- `crypto_derivatives_public` 当前已经接入第一版公开 collector，并新增了 `CME` 公开报告与 `OKX` 公共永续行情兜底；如果 CoinGecko derivatives 临时不可得，但同次 `CME` 或 `OKX` 公共链路可用，当前会保持 success 且 provenance 真实
+- GUI 当前已经可运行，但仍主要读取 CSV/state 浏览层，而不是完整 DuckDB 查询应用
+- 平台级统一视图虽然已经落地并进入 GUI / DuckDB，但仍属于第一版 latest-view，不等于各资产族逐券全历史表已经全部接齐
+
+## Repaired polluted dates
+
+- `2026-04-16`
+  - prior issue: canonical options / derivatives / contracts / views were truncated to `SZSE`
+  - current result: canonical outputs rebuilt to full expected exchange coverage
+- `2021-04-16`
+  - prior issue: canonical state was repeatedly re-audited under tightened completeness / applicability rules, and长期卡在 `SZSE` 历史期权覆盖缺口
+  - current result: 已完成 rebuild / re-audit，当前 `audit` 为 `needs_repair = false`，且不再保留 `blocked_issues`
+
+## Remaining coverage gaps
+
+- Phase A2 remainder: venue-by-venue official result endpoints and richer official master-data field coverage
+- Phase A3 remainder: DCE/SZSE/SSE option source hardening on uncached dates
+- Phase B1 remainder: broader cross-year and continuous-window regression
+- Phase C sources not started: interbank / OTC-visible module skeleton exists only at the platform-registry / GUI layer, not at the collector layer
+- Phase C partially started for两条支线：
+  - 公开资产快照：equities / BSE / ETF / 开放式基金 / 货币基金 / REITs / 可转债 已有首批 collector
+  - 公开贵金属：SGE 现货日行情已有首批 collector（当前为 opt-in）
+  - 公开参考表：人民币外汇参考价 / 人民币外汇即期报价 / Shibor / LPR / 回购利率 / 上海金银基准价 已有首批 collector
+- Phase C 又新增了债券支线：
+  - 银行间现券成交 / 报价 / 收益率曲线，以及上交所债券摘要表 已有首批 collector
+- Phase C 还新增了第三条“全球观察”支线：
+  - crypto_global_snapshot 已有首批 collector，并已在 GUI 中单独标注 legal note
+- 交易所债、债券主数据、外汇即期远期、更多商品现货仍未开始正式接入
+- crypto 观察模块已起步，但历史序列、CME 报告、更多币种与更丰富参考表仍待继续扩展
